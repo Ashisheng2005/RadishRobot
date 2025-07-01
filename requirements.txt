@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+tree-sitter
+lizard
+pygithub
+python-dotenv
+requests
+pyyaml
+openai
+python-multipart
+ollama

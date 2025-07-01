@@ -1,0 +1,313 @@
+# RaidishRobot
+
+跨语言代码审查与重构工具
+
+
+
+![github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)![python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)![](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+
+![vison](https://img.shields.io/badge/RadishRobot-v0.0.1-blue)![python](https://img.shields.io/badge/python-3.8%2B-blue)![todo](https://img.shields.io/badge/todo_list-GitHub_Project-blue)![npm](https://img.shields.io/badge/npm-10.9.2-blue)
+
+
+
+## 项目概述
+
+这是一个基于大模型API的Web应用，旨在为开发者提供跨语言（Python、C++等多种语言）代码审查、重构和文档生成服务。用户可上传代码或输入GitHub仓库URL，工具利用多模型 API检测代码问题、优化代码并生成文档，生成函数思维导图，解决中小团队的代码质量和迁移痛点，通过函数导图也能够帮助用户快速上手陌生仓库。
+
+- **目标**: 提供实用、轻量级的代码审查工具，支持跨语言重构和自动化文档生成。
+- **技术栈**: FastAPI（后端），React + Tailwind CSS + shadcn-ui（前端），Tree-sitter（代码解析），API（模型推理）。
+- **状态**: 测试中（v0.0.1）。
+
+
+
+:warning: 项目处于开发初期，请勿置于非安全环境使用以防为您带来不便
+
+
+
+## 功能效果
+
+部署且配置成功后可见当前版本网页：
+
+![index](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/index.png)
+
+
+
+### **代码审查**功能示例
+
+我们在这里给出一段一维动规的题解：
+
+```python
+def donggui():
+    # 一维动态规划
+    f = [0 for i in range(n+1)]
+    f[1] = mp[0][0]
+    for i in range(2, n+1):
+        for j in range(i, 0, -1):
+            f[j] = max(f[j], f[j-1]) + mp[i-1][j-1]
+
+    ans = max(f)
+    return ans
+
+print(donggui())
+```
+
+将代码贴入代码框，点击审查代码按钮(本地模型：**qwen2.5:7b**回复)
+
+![](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/test_local_1.png)
+
+模型给出了两个存在的问题和优化后的代码以及重构总结，测试是基于本地模型**qwen2.5:7b**的回复，如果改为云端API，回复会更完美，但同时也会增加时间损耗。
+
+
+
+### **获取Github代码**功能示例
+
+目前的流程只是通过获取项目匹配后缀文件的代码然后贴到代码框中。这种方法存在很多的问题（高token消耗，回复量大导致的格式问题等），后续根据需要会改变功能，
+
+示例：github ： https://github.com/Ashisheng2005/Live2dTK
+
+![](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/test_local_2.png)
+
+
+
+### 思维导图功能
+
+获取github项目代码，通过抽象语法树抽解函数节点，然后进行可视化展现，（**强烈建议本功能使用本地模型，速度非常快，如果是云端API，可能需要等超级久**！！！）
+
+示例: github : https://github.com/Ashisheng2005/CuckooIDE
+
+![](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/test_local_3.gif)
+
+软乎乎的非常丝滑！！！
+
+
+
+### 查看历史记录功能
+
+点击后可以在**右侧抽屉栏**中选择恢复记录，类型**Project**为思维导图，**input**为代码审查
+
+
+
+## 文件布局
+
+
+
+
+
+## 快速启动
+
+1. #### **配置环境**:
+   
+   ***python环境要求***： 
+   
+   开发版本是是3.8，推荐使用3.8或以上版本，但高版本也支持，如果出现因为版本原因的错误欢迎在github上提issues
+   
+   ​	3.10以下可能会触发BUG: *ERROR:asyncio:Exception in callback ProactorBasePipeTransport.call_connection_lost(None)*，目前已被官方收录GitHub: https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/7524, 日志记录时可以不以理会，后续官方给出解决方法会第一时间修复。
+   
+   日志记录示例：
+   
+   ```bash
+   2025-06-10 23:27:49,353 - asyncio - ERROR - Exception in callback _ProactorBasePipeTransport._call_connection_lost(None)
+   handle: <Handle _ProactorBasePipeTransport._call_connection_lost(None)>
+   Traceback (most recent call last):
+     File "D:\python\lib\asyncio\events.py", line 81, in _run
+       self._context.run(self._callback, *self._args)
+     File "D:\python\lib\asyncio\proactor_events.py", line 162, in _call_connection_lost
+       self._sock.shutdown(socket.SHUT_RDWR)
+   ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+   ```
+   
+   
+   
+   ***库配置***：
+   
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
+   
+   
+2. #### **安装npm工具**
+
+   官方网站： https://www.nodejs.com.cn/download.html， 选择对应系统配置后下载安装包安装即可
+
+   
+
+3. #### **编辑配置文件**:
+
+   ```yaml
+   model_set:
+     MODEL_NAME: "deepseek" # 模型名称，如果是云端API则填写下方对应配置开头，如果是本地则填写模型具体名称
+     PATTERN: "cloud"	 	# 模型，cloud 云端， local 本地（默认ollama后端）
+     POLLING: "True"		# 因为本地模型较小，可能回答格式有问题，添加一个轮询机制，是否开启
+     MAX_RETRIES: 3		# 最大轮询次数
+   
+   
+   # deepseek 官方
+   deepseek:
+     API_KEY: ""	# deepseek的用户api_key， 再用户中心可获得
+     BASE_URL: "https://api.deepseek.com"
+     MAX_TOKEN: 50000	# 最大返回token数量，建议设置大一些，否则会截断数据触发错误
+     MODEL: "deepseek-reasoner"
+   
+   # 硅基流动
+   siliconflow:
+     model: ""
+     MAX_TOKEN: 32768	# 免费的Qwen/QwQ-32B模型强制最大token为32768
+     API_KEY: ""	# siliconflow的用户api_key， 再用户中心可获得
+     BASE_URL: "https://api.siliconflow.cn/v1/"
+     
+   
+   github_set:
+     token: ""	# 如果需要处理github项目，则需要用户添加github的token
+   
+   
+   logging:
+     level: "INFO"
+     file: "./logs/app.log"	# 日志位置
+   
+   ```
+
+
+
+
+​	自定义云端api, 前提是兼容openAI的交互格式：
+
+​	
+
+```yaml
+api_name:
+	model: ""	# 模型名称
+	MAX_TOKEN:	# 最大token，不同的平台可能会有不同的限制要求
+	API_KEY:	# api的key
+	BASE_URL:	# 基本的url， 会自动拼接末尾的 chat/completions，请注意填写格式
+```
+
+​	
+
+我们以deepseek为例：
+
+```yaml
+deepseek:
+  API_KEY: ""	# deepseek的用户api_key， 再用户中心可获得
+  BASE_URL: "https://api.deepseek.com"
+  MAX_TOKEN: 50000	# 最大返回token数量，建议设置大一些，否则会截断数据触发错误
+  MODEL: "deepseek-reasoner"
+```
+
+
+
+构建的完整请求url为 https://api.deepseek.com/chat/completions ， 官方为了符合openai的标准，实际的请求url也可以为 https://api.deepseek.com/v1/chat/completions
+
+**`deepseek-chat` 模型指向 DeepSeek-V3-0324，** 通过指定 `model='deepseek-chat'` 调用。
+
+**`deepseek-reasoner` 模型指向 DeepSeek-R1-0528，** 通过指定 `model='deepseek-reasoner'` 调用。
+
+自定义完成后直接修改MODEL_NAME参数即可
+
+
+
+1. **后端启动**：
+
+   
+
+   ```bash
+   python main.py
+   ```
+
+   
+
+   启动后回显如下：
+
+   ```bash
+   2025-06-09 16:36:21,918 - backend.core.logger - INFO - FastAPI 服务启动
+   INFO:     Started server process [14308]
+   INFO:     Waiting for application startup.
+   INFO:     Application startup complete.
+   INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+   ```
+
+   
+
+   访问 http://127.0.0.1:8000/ 显示：
+
+   ```json
+   {"message":"欢迎来到RadishRobot!","endpoints":{"/health":"Check API status","/github/fetch":"Fetch code from GitHub repository","/review":"Review and refactor code"},"docs":"/docs"}
+   ```
+
+   显示如上则表示启动成功
+
+   
+
+2. **前端启动**:
+
+   
+
+   ```bash
+   cd rr_frontend
+   npm run dev
+   ```
+
+   回显如下：
+
+   ```bash
+   > rr_frontend@0.0.0 dev
+   > vite
+   
+   
+     VITE v6.3.5  ready in 4262 ms
+   
+     ➜  Local:   http://localhost:5173/
+     ➜  Network: use --host to expose
+     ➜  press h + enter to show help
+   ```
+
+   访问 http://localhost:5173/ 显示
+
+   ![](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/index.png)
+
+   
+
+3. **添加更多语言**
+
+   项目中对于代码审计是基于 Python Tree-sitter(github：https://github.com/tree-sitter/py-tree-sitter)， 项目内置了五种语言的处理库，见于 RadishRobot\backend\core\vendor 目录下：
+
+   ```bash
+    tree-sitter-c-sharp
+    tree-sitter-cpp
+    tree-sitter-java
+    tree-sitter-javascript
+    tree-sitter-python
+   ```
+
+   
+
+   当这五种语言完全不足以满足用户需求的时候，用户可以自己下载更多的语言库，在官网(https://github.com/tree-sitter/tree-sitter/wiki/List-of-parsers) 中可以查找想要的语言，复制对应的**链接**，在**RadishRobot\backend\core\vendor** 目录下执行
+
+   ```bash
+   git clone https://github.com/xxxxxxxxx/tree-sitter-XXXXXXXXXXX
+   ```
+
+   
+
+   
+
+   安装后重启后端即可。
+
+   
+
+4. #### **修改默认端口**
+
+   修改配置文件 ".\RadishRobot\rr_frontend\node_modules\vite\dist\node\constants.js" 末尾处配置项：
+
+   ```js
+   const DEFAULT_DEV_PORT = 5173;		# 开发模式的post
+   const DEFAULT_PREVIEW_PORT = 4173;	# 预览模式的post
+   ```
+
+   
+
+
+
+## 许可证
+MIT License
+

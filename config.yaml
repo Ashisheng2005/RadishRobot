@@ -1,0 +1,27 @@
+model_set:
+  MODEL_NAME: "deepseek"
+  PATTERN: "cloud"
+  POLLING: "True"
+  MAX_RETRIES: 3
+
+deepseek:
+  API_KEY: ""
+  BASE_URL: "https://api.deepseek.com"
+  MAX_TOKEN: 50000
+  MODEL: "deepseek-reasoner"
+
+
+siliconflow:
+  MODEL: "Qwen/QwQ-32B"
+  MAX_TOKEN: 32768
+  API_KEY: ""
+  BASE_URL: "https://api.siliconflow.cn/v1/"
+
+
+github_set:
+  token: ""
+
+
+logging:
+  level: "INFO"
+  file: "./logs/app.log"

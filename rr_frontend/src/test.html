@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+    import { Network, DataSet } from 'vis-network/standalone/esm/vis-network';
+    window.Network = Network;
+    window.DataSet = DataSet;
+  </script>
+</head>
+<body>
+  <div id="mynetwork" style="width: 600px; height: 600px; border: 1px solid;"></div>
+  <script type="module">
+    import { renderMindmap } from './src/utils/mindmap.js';
+    const data = {
+      nodes: [
+        { id: "1:func1", label: "func1", details: "Test", code: "def func1()" },
+        { id: "1:func2", label: "func2", details: "Test", code: "def func2()" }
+      ],
+      edges: [{ from_: "1:func1", to: "1:func2" }]
+    };
+    renderMindmap(data, 'mynetwork', 'mynetwork');
+  </script>
+</body>
+</html>
