@@ -4,9 +4,9 @@
 
 
 
-![github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)![python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)![](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)		![python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)     	![](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)		![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)
 
-![vison](https://img.shields.io/badge/RadishRobot-v0.0.1-blue)![python](https://img.shields.io/badge/python-3.8%2B-blue)![todo](https://img.shields.io/badge/todo_list-GitHub_Project-blue)![npm](https://img.shields.io/badge/npm-10.9.2-blue)
+![vison](https://img.shields.io/badge/RadishRobot-v0.0.1-blue)		![python](https://img.shields.io/badge/python-3.8%2B-blue)		![todo](https://img.shields.io/badge/todo_list-GitHub_Project-blue)		![npm](https://img.shields.io/badge/npm-10.9.2-blue)
 
 
 
@@ -304,7 +304,20 @@ deepseek:
    const DEFAULT_PREVIEW_PORT = 4173;	# 预览模式的post
    ```
 
-   
+
+
+
+
+
+【流式更新日志】
+
+2025.7.3 
+
+修复了本地轮询后缀表机制的bug
+
+
+
+
 
 
 

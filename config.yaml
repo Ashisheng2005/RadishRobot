@@ -1,6 +1,6 @@
 model_set:
-  MODEL_NAME: "deepseek"
-  PATTERN: "cloud"
+  MODEL_NAME: "qwen2.5:7b"
+  PATTERN: "local"
   POLLING: "True"
   MAX_RETRIES: 3
 

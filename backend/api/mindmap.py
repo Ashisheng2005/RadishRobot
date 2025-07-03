@@ -66,19 +66,26 @@ async def call_llm(content: str) -> str:
     return reply['message']
 
 
-async def ask_suffix(language: str) -> str:
+def ask_suffix(language: str, prompt: str = False) -> str:
     """
     询问指定语言的文件后缀
 
+    :param prompt: 额外的提示词
     :param language: 语言名称
     :return: str
     """
-    reply = send_message(message=f"请直接返回{language}语言的文件后缀名，不带点号", join=False, clean_data=False)
 
-    return reply['message']
+    # 这里感觉怪怪的，下次优化把这里改一下，Ciallo~
+    if prompt:
+        reply = send_message(message=f"{prompt}", join=False, clean_data=False)
+
+    else:
+        reply = send_message(message=f"请直接返回{language}语言的文件后缀名，不带点号", join=False, clean_data=False)
+
+    return str(reply['message'])
 
 
-def create_language_dict(file_path: str = "./language.config") -> Dict:
+def create_language_dict(file_path: str = "./language.json") -> Dict:
     """
     初始化语言后缀映射表，判断当前存在的是否与语言库一一对应，有缺漏或者文件不存在则尝试修复
 
@@ -87,25 +94,49 @@ def create_language_dict(file_path: str = "./language.config") -> Dict:
     """
 
     language_dict = {}
+    language_dict_ = {}
     try:
+        logger.info(f"初始化语言后缀表")
+
         if os.path.isfile(file_path):
             with open(file_path, "r", encoding='utf-8') as file:
-                language_dict = loads(file.read())
+                language_dict_ = loads(file.read())
 
-        for language_project in listdir("./backend/core/vendor"):
-            if language_project.startswith("tree-sitter-"):
-                language = language_project[12:]
+        # 剔除项目前缀 tree-sitter-
+        language_list = [item[12:] for item in listdir("./backend/core/vendor")]
+
+        for language_project in language_list:
+                language = language_project
                 if language_dict.get(language, False):
                     continue
 
-                # 这里留一个中间变量为以后的返回内容验证做准备
-                language_suffix = ask_suffix(language)
-                language_dict[language] = language_suffix
+                pattern = config.get_nested("model_set", "PATTERN", default=False)
+                if pattern == "local":
+                    # 这里留一个中间变量为以后的返回内容验证做准备
+                    language_suffix = ask_suffix(language)
+                    language_dict[language] = language_suffix
+                    logger.info(f"询问本地模型后缀回复 {language}: {language_suffix}")
+
+                elif pattern == "cloud":
+                    language_suffix = ask_suffix(prompt = f"请按顺序返回{'、'.join(language_list)}语言的文件后缀名，不带点号且以空格分割，例如cpp py java")
+                    for i in range(len(language_list)):
+                        language_dict[language_list[i]] = language_suffix.split()[i]
+
+                    break
 
     except Exception as err:
         logger.info(f"initial language dict error: {err}")
 
-    return language_dict
+    # 反转，使用后缀作为key， 语言名称作为value
+    if not language_dict_:
+        for key in language_dict:
+            language_dict_[language_dict[key]] = key.replace('-', "_")
+
+        # 保存
+        with open(file_path, "w", encoding='utf-8') as file:
+            file.write(dumps(language_dict_, ensure_ascii=False))
+
+    return language_dict_
 
 
 def extract_functions(file_content: str, file_path: str, code_type: str) -> Tuple[list, list]:
@@ -285,4 +316,4 @@ if __name__ == '__main__':
     edges = []
     """
 
-    print(extract_functions(file_content=code, file_path="input.py", code_type="python"))
+    print(ask_suffix(language="python"))
