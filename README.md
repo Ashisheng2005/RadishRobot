@@ -89,7 +89,7 @@ print(donggui())
 
 ## 文件布局
 
-
+详见 [文件布局](https://github.com/Ashisheng2005/RadishRobot/blob/main/docs/files.md)
 
 
 
@@ -128,7 +128,18 @@ print(donggui())
    
 2. #### **安装npm工具**
 
+   **Win:**
+
    官方网站： https://www.nodejs.com.cn/download.html， 选择对应系统配置后下载安装包安装即可
+
+   
+
+   **Linux:**
+
+   ```bash
+   sudo apt update
+   sudo apt install nodejs npm
+   ```
 
    
 
@@ -141,6 +152,10 @@ print(donggui())
      POLLING: "True"		# 因为本地模型较小，可能回答格式有问题，添加一个轮询机制，是否开启
      MAX_RETRIES: 3		# 最大轮询次数
    
+   server_set:
+     host_ip: "auto"		# ip地址配置，auto表示自动配置，也可以手动强制配置指定ip
+     post: 8000			# 这里指定的是后端端口，不推荐修改，因为作者还没有处理到这一部分
+     public: "True"		# True表示公开服务，自动网络配置会将服务开放，填写其他表示服务仅本地使用，外部无法访问
    
    # deepseek 官方
    deepseek:
@@ -171,8 +186,6 @@ print(donggui())
 
 
 ​	自定义云端api, 前提是兼容openAI的交互格式：
-
-​	
 
 ```yaml
 api_name:
@@ -216,11 +229,27 @@ deepseek:
 
    
 
+   自动网络配置服务会扫描本地可用ip，当然也包括虚拟网卡的ip，如果出现多个ip，会让用户选择合适的ip， 例如：
+
+   ```bash
+   Multiple ips have been detected. Please select a suitable one:
+   
+   1: 10.16.0.1
+   2: 192.168.111.1
+   3: 192.168.0.106
+   >>> 3
+   ```
+
+   选择一个填写**冒号前的 id** 回车即可。
+
+   
+
    启动后回显如下：
 
    ```bash
-   2025-06-09 16:36:21,918 - backend.core.logger - INFO - FastAPI 服务启动
-   INFO:     Started server process [14308]
+   2025-07-14 23:12:05,778 - backend.core.logger - INFO - FastAPI 服务启动成功
+   2025-07-14 23:12:05,780 - backend.core.logger - INFO - 自动ip配置成功，ip: 192.168.0.106, post: 8000
+   INFO:     Started server process [26412]
    INFO:     Waiting for application startup.
    INFO:     Application startup complete.
    INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
@@ -228,7 +257,7 @@ deepseek:
 
    
 
-   访问 http://127.0.0.1:8000/ 显示：
+   访问 http://127.0.0.1:8000/  或者 **自己指定的ip+8000** 端口会显示：
 
    ```json
    {"message":"欢迎来到RadishRobot!","endpoints":{"/health":"Check API status","/github/fetch":"Fetch code from GitHub repository","/review":"Review and refactor code"},"docs":"/docs"}
@@ -256,7 +285,7 @@ deepseek:
    
      VITE v6.3.5  ready in 4262 ms
    
-     ➜  Local:   http://localhost:5173/
+     ➜  Local:   http://localhost:5173/	# 这里可能会出现多个ip，选择配置的ip访问
      ➜  Network: use --host to expose
      ➜  press h + enter to show help
    ```
@@ -287,24 +316,46 @@ deepseek:
    git clone https://github.com/xxxxxxxxx/tree-sitter-XXXXXXXXXXX
    ```
 
-   
-
-   
-
    安装后重启后端即可。
+
+   
 
    
 
 4. #### **修改默认端口**
 
-   修改配置文件 ".\RadishRobot\rr_frontend\node_modules\vite\dist\node\constants.js" 末尾处配置项：
+   1. 修改配置文件 ".\RadishRobot\rr_frontend\node_modules\vite\dist\node\constants.js" 末尾处配置项：
 
-   ```js
-   const DEFAULT_DEV_PORT = 5173;		# 开发模式的post
-   const DEFAULT_PREVIEW_PORT = 4173;	# 预览模式的post
-   ```
+      除非专业人员否则不建议改动该文件内容，会导致很多bug
 
+      ```js
+      const DEFAULT_DEV_PORT = 5173;		# 开发模式的post
+      const DEFAULT_PREVIEW_PORT = 4173;	# 预览模式的post
+      ```
 
+   
+
+5. **Linux配置可能存在的问题**
+
+   1. 执行 npm run dev 提示 sh: 1: vite: Permission denied， 解决方法：
+
+      ```bash
+      cd RadishRobot/rr_frontend
+      chmod +x node_modules/.bin/vite
+      ```
+
+      这是由于文件没有足够的执行权限，提权之后即可
+
+      
+
+   2.  依旧是执行 npm run dev 时候提示 Platform-specific optional dependencies not being included in `package-lock.json` when reinstalling with `node_modules` present， [https://github.com/npm/cli/issues/4828],依照官方给出的方法需要完全删除 node_modules 文件夹，但这样太麻烦了，我将node_modules文件夹完整上传本身就是为了方便用户搭建，节省环境配置时间，解决方法：
+
+      ```bash
+      cd RadishRobot/rr_frontend
+      npm install
+      ```
+
+      由于项目开发环境为Win，可能会有些文件与Linux环境不匹配，不必删除，直接 install 一下即可。
 
 
 
@@ -314,6 +365,16 @@ deepseek:
 2025.7.3 
 
 修复了本地轮询后缀表机制的bug
+
+2025.7.14
+
+修复配置文件路径bug
+
+优化部分处理流程和网络配置数据方式
+
+添加网络自动配置功能，添加**仅本地使用**和**开放使用**两种模式
+
+适配Linux平台，支持在Linux平台搭建对外开放服务
 
 
 

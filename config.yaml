@@ -4,12 +4,16 @@ model_set:
   POLLING: "True"
   MAX_RETRIES: 3
 
+server_set:
+  host_ip: "auto"
+  post: 8000
+  public: "True"
+
 deepseek:
   API_KEY: ""
   BASE_URL: "https://api.deepseek.com"
   MAX_TOKEN: 50000
   MODEL: "deepseek-reasoner"
-
 
 siliconflow:
   MODEL: "Qwen/QwQ-32B"

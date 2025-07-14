@@ -29,6 +29,14 @@ export default defineConfig({
     fs: {
       allow: ['.'],
     },
-
+    host: '0.0.0.0',
+    port: 5173,
+    proxy: {
+        '/api': {
+            target: 'http://192.168.0.106:8000',
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+    },
   },
 })

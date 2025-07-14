@@ -72,7 +72,7 @@ const App: React.FC = () => {
   // 获取历史记录
   const fetchHistory = async (): Promise<void> => {
     try {
-      const response = await fetch('http://localhost:8000/history', {
+      const response = await fetch('/api/history', {
         method: 'GET',
       });
       const data: HistoryItem[] = await response.json();
@@ -113,7 +113,7 @@ const App: React.FC = () => {
         formData.append('branch', branch);
       }
 
-      const response = await fetch('http://localhost:8000/review', {
+      const response = await fetch('/api/review', {
         method: 'POST',
         body: formData,
       });
@@ -134,7 +134,7 @@ const App: React.FC = () => {
     setResults(null);
     try {
       const response = await fetch(
-        `http://localhost:8000/github/fetch?github_url=${encodeURIComponent(githubUrl)}&branch=${branch}`
+        `/api/github/fetch?github_url=${encodeURIComponent(githubUrl)}&branch=${branch}`
       );
       const data: ApiResponse & { files?: FileData } = await response.json();
       if (response.ok && data.files) {
@@ -155,7 +155,7 @@ const App: React.FC = () => {
         ? [{ path: "input.py", content: code }]
         : githubUrl
         ? (await fetch(
-            `http://localhost:8000/github/fetch?github_url=${encodeURIComponent(githubUrl)}&branch=${branch}`
+            `/api/github/fetch?github_url=${encodeURIComponent(githubUrl)}&branch=${branch}`
           ).then(res => res.json())).files
         : [];
 
@@ -169,7 +169,7 @@ const App: React.FC = () => {
         content: file.code
       }));
 
-      const response = await fetch('http://localhost:8000/mindmap', {
+      const response = await fetch('/api/mindmap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ files: fileList, github_url: githubUrl, branch })

@@ -1,3 +1,8 @@
-from backend.api.mindmap import ask_suffix
+from socket import gethostname, gethostbyname, gethostbyname_ex
 
-print(ask_suffix(language="python"))
+hostname = gethostname()
+
+ip_list = gethostbyname_ex(hostname)[2]
+for i in ip_list:
+    print(i)
+
