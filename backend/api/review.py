@@ -18,7 +18,7 @@ from backend.database.sqlite_db import save_review
 config = Config("./config.yaml")
 logger = setup_logger(config)
 
-router = APIRouter(prefix="/review", tags=["review"])
+router = APIRouter(prefix="/api/review", tags=["review"])
 
 
 @router.post("/")

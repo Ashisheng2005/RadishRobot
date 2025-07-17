@@ -18,7 +18,7 @@ config = Config("./config.yaml")
 logger = setup_logger(config)
 GITHUB_TOKEN = config.get_nested("github_set", "token", default="")
 
-router = APIRouter(prefix="/github", tags=["github"])
+router = APIRouter(prefix="/api/github", tags=["github"])
 
 
 async def fetch_github_code(github_url: str, branch: str = "main", path: str = "") -> dict:

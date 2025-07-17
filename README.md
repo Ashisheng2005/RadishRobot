@@ -359,6 +359,28 @@ deepseek:
 
 
 
+## Release 版本部署
+
+当前提供release的版本为 Complete 包模式，包含 build 之后的所有内容，方便用户快速部署。
+
+该版本可快速部署非开发环境服务，下载最新的release版本后将文件夹解压，首先创建python环境(推荐虚拟环境)：
+
+```bash
+pip install -r requirements.txt
+```
+
+按照开发模式中的配置选项修改配置文件后，只需执行：
+
+```bash
+python main.py
+```
+
+成功运行后访问8000端口即可使用。
+
+
+
+
+
 
 【流式更新日志】
 
@@ -376,7 +398,11 @@ deepseek:
 
 适配Linux平台，支持在Linux平台搭建对外开放服务
 
+2025.7.17
 
+打包推出Release 0.0.1体验版本
+
+分流支持 **开发** 和 **测试 **两种模式
 
 
 

@@ -10,9 +10,10 @@
 import os
 
 # 第三方库导入
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 # 本地模块导入
 from backend.api import review, github, history, mindmap
@@ -59,17 +60,19 @@ try:
 
     post = config.get_nested("server_set", "post")
     public = config.get_nested("server_set", "public")
+    mode = config.get_nested("server_set", "mode")
     logger.info(f"FastAPI 服务启动成功")
 
 except Exception as e:
     print(f"配置加载失败: {e}")
     raise
 
+
 # 初始化FastAPI应用
 app = FastAPI(
     title="RadishRobot",
     description="一个使用大型语言模型api进行代码审查、重构、文档生成和关系链可视化的工具。",
-    version="0.1.0"
+    version="0.0.1"
 )
 
 
@@ -140,7 +143,7 @@ public_allow_origins = [f"http://{host_ip}:3000", f"http://{host_ip}:5173", f"ht
 app.add_middleware(
     CORSMiddleware,
     # 调整前端URL
-    allow_origins = public_allow_origins if public == "True" else local_allow_origins,
+    allow_origins=public_allow_origins if public.lower() == "true" else local_allow_origins,
     # allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -157,6 +160,25 @@ app.include_router(github)
 app.include_router(history)
 # 可视化节点
 app.include_router(mindmap)
+
+if mode.lower() == "test":
+    logger.info(f"当前模式： Test")
+    # 加载静态资源
+    app.mount("/static", StaticFiles(directory="./static"), name="static")
+
+    # 根路径返回 index.html
+    @app.get("/")
+    async def serve_index():
+        logger.info("Serving index.html")
+        return FileResponse("./static/index.html")
+
+    # 日志中间件
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        logger.info(f"Request: {request.method} {request.url}")
+        response = await call_next(request)
+        logger.info(f"Response status: {response.status_code}")
+        return response
 
 
 # Root endpoint
@@ -188,20 +210,12 @@ async def health_check():
     logger.info("请求运行状况检查")
     return {"status": "healthy", "message": "API is running"}
 
+# @app.get("/test")
+# async def test_history():
+#     return {"message": "Test history endpoint"}
+
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-    # from backend.core.parser import CodeTree
-
-    # demo = CodeTree()
-    # code = """
-    # def fun():
-    #     print("This is text string!")
-    #
-    # for i in range(10):
-    #     fun()
-    # """
-    # code_tokens = demo.processing_coed("python", code)
-    # print(code_tokens)

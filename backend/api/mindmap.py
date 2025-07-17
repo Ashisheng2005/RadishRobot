@@ -22,7 +22,7 @@ from backend.database.sqlite_db import save_review
 config = Config("./config.yaml")
 logger = setup_logger(config)
 
-router = APIRouter(prefix="/mindmap", tags=["mindmap"])
+router = APIRouter(prefix="/api/mindmap", tags=["mindmap"])
 
 
 class FileInput(BaseModel):
