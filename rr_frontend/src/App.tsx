@@ -72,7 +72,7 @@ const App: React.FC = () => {
   // 获取历史记录
   const fetchHistory = async (): Promise<void> => {
     try {
-      const response = await fetch('/api/history', {
+      const response = await fetch('/api/history/', {
         method: 'GET',
       });
       const data: HistoryItem[] = await response.json();
@@ -113,7 +113,7 @@ const App: React.FC = () => {
         formData.append('branch', branch);
       }
 
-      const response = await fetch('/api/review', {
+      const response = await fetch('/api/review/', {
         method: 'POST',
         body: formData,
       });
@@ -169,7 +169,7 @@ const App: React.FC = () => {
         content: file.code
       }));
 
-      const response = await fetch('/api/mindmap', {
+      const response = await fetch('/api/mindmap/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ files: fileList, github_url: githubUrl, branch })
