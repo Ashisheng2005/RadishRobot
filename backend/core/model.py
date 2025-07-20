@@ -127,7 +127,8 @@ def ollama_server(model_name: str, message: str, join: bool = True, clean_data: 
 
                 continue
 
-            logger.info(f"API 返回内容: {reply}")
+            logger.info(f"API 回复: {reply[:30]}")
+            # logger.info(f"API 返回内容: {reply}")
 
             if not clean_data:
                 return return_template(200, reply)
@@ -148,7 +149,8 @@ def ollama_server(model_name: str, message: str, join: bool = True, clean_data: 
             # reply = reply.replace(r'"""', r'\\"\\"\\"')
             # reply = reply.replace('"issues"', '\n"issues"')
 
-            logger.info(f"API 返回内容处理结果: {clean_reply}")
+            # logger.info(f"API 返回内容处理结果: {clean_reply}")
+            logger.info(f"API 返回内容处理结果: {clean_reply[:30]}")
 
             # 尝试直接解析JSON
             try:
@@ -271,9 +273,9 @@ def get_general_api_response(client, model_name, message: str, join: bool = True
 
     try:
 
-        logger.info(f"get {model_name} response: [message: {message}]")
-        messages_to_send = []
-        messages_to_send.append({"role": "user", "content": create_prompt(message) if join else message})
+        # logger.info(f"get {model_name} response: [message: {message}]")
+        logger.info(f"get {model_name} response")
+        messages_to_send = [{"role": "user", "content": create_prompt(message) if join else message}]
 
         # 回复最大token
         MAX_TOKEN = user_config.get_nested(model_name, "MAX_TOKEN", default=2000)
@@ -294,7 +296,8 @@ def get_general_api_response(client, model_name, message: str, join: bool = True
 
         reply = response.choices[0].message.content.strip()
 
-        logger.info(f"API 返回内容: {reply}")
+        # logger.info(f"API 返回内容: {reply}")
+        logger.info(f"API 回复: {reply[:30]}")
 
         if not clean_data:
             return reply
@@ -338,6 +341,8 @@ def get_general_api_response(client, model_name, message: str, join: bool = True
 
 def get_deepseek_response(client, model_name, message: str) -> Dict:
     """
+    ! 已弃用， 改为通用接口
+
     调用deepseek的API，并获取返回内容
 
     :param model_name:
@@ -348,7 +353,8 @@ def get_deepseek_response(client, model_name, message: str) -> Dict:
 
     try:
 
-        logger.info(f"get deepseek response: [message: {message}]")
+        # logger.info(f"get deepseek response: [message: {message}]")
+        logger.info(f"get deepseek response")
         messages_to_send = []
         # messages_to_send.append({"role": "system", "content": "你将扮演我的工作助理，请按照指示回答，不要有多余语句"})
         messages_to_send.append({"role": "user", "content": create_prompt(message)})
@@ -428,6 +434,7 @@ def get_deepseek_response(client, model_name, message: str) -> Dict:
 
 def get_siliconflow_response(client, model_name, message: str) -> Dict:
     """
+    ! 已弃用， 改为通用接口
     调用硅基流动平台的API
 
     :param client:
@@ -437,7 +444,8 @@ def get_siliconflow_response(client, model_name, message: str) -> Dict:
     """
     try:
 
-        logger.info(f"get siliconflow response: [message: {message}]")
+        # logger.info(f"get siliconflow response: [message: {message}]")
+        logger.info(f"get siliconflow response")
         messages_to_send = []
         # messages_to_send.append({"role": "system", "content": "你将扮演我的工作助理，请按照指示回答，不要有多余语句"})
         messages_to_send.append({"role": "user", "content": create_prompt(message)})
@@ -513,8 +521,6 @@ def get_siliconflow_response(client, model_name, message: str) -> Dict:
             logger.error("错误：" + str(e))
 
         return return_template(state=500, message=str(e))
-
-
 
 
 if __name__ == '__main__':

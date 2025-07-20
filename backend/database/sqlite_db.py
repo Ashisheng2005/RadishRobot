@@ -18,6 +18,43 @@ logger = setup_logger(config)
 DB_PATH = "./backend/database/review_history.db"
 
 
+def delete_review(data_id: int):
+    """
+    根据行标删除数据，并且自动恢复有序行标
+
+    :param data_id: 需要删除的行标
+    :return: 一个状态码？
+    """
+
+    conn = None
+
+    try:
+        conn = sqlite3.connect("./backend/database/review_history.db")
+        c = conn.cursor()
+        # 删除
+        c.execute(f"""delete from reviews where id=?""", (data_id,))
+
+        # 指向数据不存在
+        if c.rowcount == 0:
+            logger.info(f"未找到ID:{data_id} 的数据")
+            return False
+
+        # 恢复有序
+        c.execute(f"""update reviews set id=id-1 where id > ?""", (data_id,))
+
+        # 提交业务
+        conn.commit()
+        return True
+
+    except Exception as err:
+        logger.info(f"记录删除失败 {err}")
+        return False
+
+    finally:
+        if conn:
+            conn.close()
+
+
 def save_review(results: dict):
     """
     保存代码审查结果到数据库。
@@ -34,6 +71,7 @@ def save_review(results: dict):
     """
 
     conn = None
+
     try:
         conn = sqlite3.connect("./backend/database/review_history.db")
         c = conn.cursor()
@@ -167,6 +205,7 @@ def save_map(results: dict):
         if conn:
             conn.close()
 
+
 def get_reviews():
     """
     从数据库获取所有代码审查和流程图的历史记录。
@@ -226,5 +265,9 @@ def get_reviews():
 
     except Exception as e:
         logger.error(f"意料以外的异常: {str(e)}")
+
+    finally:
+        if conn:
+            conn.close()
 
     return []

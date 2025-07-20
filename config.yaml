@@ -12,11 +12,11 @@ server_set:
   # auto 自动配置（Automatic configuration） ; 或者强制指定（Fixed ip address）
   host_ip: "auto"
   # 端口
-  post: 8000
+  port: 8000
   # 公开服务 false true
-  public: "false"
+  public: "true"
   # Development、dp、Dp 开发模式； Test、test 测试模式
-  mode: "Development"
+  mode: "test"
 
 deepseek:
   API_KEY: ""

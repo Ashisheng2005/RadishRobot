@@ -3,5 +3,6 @@ __pycache__/
 .idea/
 tests/
 static/
+backend/core/vendor/*
 .env
 *.log

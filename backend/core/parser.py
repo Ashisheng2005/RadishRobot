@@ -25,7 +25,7 @@ class CodeTree:
 
     def __init__(self):
         if not CodeTree._BUILT:
-            self._build_language_library()
+            self.build_language_library()
             # 初始化类属性
             for item in CodeTree._LANGUAGES:
                 setattr(CodeTree, f"{item}_LANGUAGE",
@@ -45,7 +45,7 @@ class CodeTree:
             setattr(self, f"{item}_LANGUAGE", getattr(CodeTree, f"{item}_LANGUAGE"))
 
 
-    def _build_language_library(self):
+    def build_language_library(self):
         """
         构建语言库， 动态生成语言映射表
         :return:
@@ -54,8 +54,7 @@ class CodeTree:
         Language.build_library(
             './backend/core/build/my-languages.so',
             [
-                f'./backend/core/vendor/tree-sitter-{item.replace("_", "-")}'
-                for item in CodeTree._LANGUAGES
+                f'./backend/core/vendor/tree-sitter-{item.replace("_", "-")}' for item in CodeTree._LANGUAGES
             ]
         )
 

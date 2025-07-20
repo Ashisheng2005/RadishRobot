@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/static/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -33,7 +34,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
         '/api': {
-            target: 'http://localhost:8000',
+            target: 'http://192.168.0.106:8000',
             changeOrigin: true,
             // rewrite: (path) => path.replace(/^\/api/, ''),
         },

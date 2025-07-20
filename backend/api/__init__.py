@@ -10,3 +10,4 @@ from .github import router as github
 from .review import router as review
 from .history import router as history
 from .mindmap import router as mindmap
+from .deleteHistory import router as deleteHistory

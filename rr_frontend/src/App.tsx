@@ -59,6 +59,8 @@ interface MindmapResponse {
 }
 
 const App: React.FC = () => {
+  // 防止用户重复点击，天价一个加载状态
+  const [isDeleting, setIsDeleting] = useState(false);
   const [code, setCode] = useState<string>('');
   const [githubUrl, setGithubUrl] = useState<string>('');
   const [branch, setBranch] = useState<string>('main');
@@ -86,6 +88,8 @@ const App: React.FC = () => {
     }
   };
 
+
+
   // 在组件加载时获取历史记录
   useEffect(() => {
     fetchHistory();
@@ -100,6 +104,33 @@ const App: React.FC = () => {
       }).catch(e => console.error('加载 mindmap.js 失败:', e));
     }
   }, [mindmapData, isMindmapOpen]);
+
+  const deleteHistory = async (id: string | number): Promise<void> => {
+    if(!id) return;
+    setIsDeleting(true);
+    setError(null);
+    setResults(null);
+    try{
+
+      const idDate = new FormData();
+      idDate.append('data_id', id.toString());
+
+      const response = await fetch('/api/deleteHistory/', {
+        method: 'POST',
+        body: idDate,
+      });
+      const data: ApiResponse = await response.json();
+      if (response.ok) {
+        fetchHistory();
+      } else {
+        setError(data.detail ?? '记录删除失败');
+      }
+    } catch (e: unknown) {
+      setError('删除记录失败' + (e instanceof Error ? e.message : String(e)));
+    }finally{
+      setIsDeleting(false);
+      }
+  };
 
   const handleReview = async (): Promise<void> => {
     console.log('发送代码:', code);
@@ -311,7 +342,7 @@ const App: React.FC = () => {
                         {item.github_url && <p><strong>GitHub URL:</strong> {item.github_url}</p>}
                         <p><strong>分支:</strong> {item.branch}</p>
                         <Button
-                          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                          className="mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
                           onClick={() => {
 
                               if (item.file == "input"){
@@ -331,6 +362,18 @@ const App: React.FC = () => {
                         >
                           恢复
                         </Button>
+
+                        <Button
+                          className="mt-2 bg-red-600 text-white px-6 py-4 rounded-lg hover:bg-red-700 ml-6"
+                          onClick={() => {
+                              deleteHistory(item.id);
+                          }}
+                         disabled = {isDeleting}
+                        >
+                          {isDeleting ? '删除中...' : '删除'}
+                        </Button>
+
+
                       </li>
                     ))}
                   </ul>

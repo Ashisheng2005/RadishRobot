@@ -1,8 +1,4 @@
-from socket import gethostname, gethostbyname, gethostbyname_ex
-
-hostname = gethostname()
-
-ip_list = gethostbyname_ex(hostname)[2]
-for i in ip_list:
-    print(i)
-
+with open("./requirements.txt", "r", encoding="utf-8") as f:
+    data = f.read()
+    for i in data.split("\n"):
+        print(f"\"{i}\",")

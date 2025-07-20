@@ -16,12 +16,37 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 # 本地模块导入
-from backend.api import review, github, history, mindmap
+from backend.api import review, github, history, mindmap, deleteHistory
 from backend.core.logger import Config, setup_logger
-from socket import gethostname, gethostbyname_ex    # 获取ip地址
+# from socket import gethostname, gethostbyname_ex, getaddrinfo    # 获取ip地址
+import ipaddress
+import socket
+
+
+def update_vite_config(data: str, host: str, port: int, is_public: bool):
+    """更新前端配置文件"""
+    config_path = "./rr_frontend/vite.config.ts"
+    try:
+
+        # 动态构建目标地址
+        target_host = host if is_public else "localhost"
+        target_str = f"http://{target_host}:{port}"
+
+        # 替换配置
+        updated_data = data.replace("host_ip:port", target_str)
+
+        with open(config_path, "w") as f:
+            f.write(updated_data)
+
+        logger.info(f"Vite 配置已更新: {target_str}")
+        return True
+
+    except Exception as e:
+        logger.error(f"Vite 配置更新失败: {e}")
+        return False
+
 
 # 加载配置和安装记录器
-
 try:
     config = Config("config.yaml")
     logger = setup_logger(config)
@@ -29,10 +54,25 @@ try:
     # ip选配，如果存在多个ip，选择一个可用的，尼玛这就是个坑，谁知道虚拟ip也会被检测到
     host_ip = config.get_nested("server_set", "host_ip")
     if host_ip == "auto":
-        hostname = gethostname()
-        ip_list = gethostbyname_ex(hostname)[2]
-        if len(ip_list) == 1:
-            host_ip = ip_list[0]
+        # hostname = socket.gethostname()
+        # ip_list = socket.gethostbyname_ex(hostname)[2]
+
+        # 获取所有ip并过滤
+        ip_list = [
+            ip for iface in socket.getaddrinfo(socket.gethostname(), None)
+            if (ip := iface[4][0]) and ipaddress.ip_address(ip).version == 4
+        ]
+
+        if not ip_list:
+            logger.info(f"没有检测到ip地址")
+            exit(1)
+
+        # 优先选择非回环地址
+        non_loopback = [ip for ip in ip_list if not ipaddress.ip_address(ip).is_loopback]
+        host_ip = non_loopback[0]
+
+        if len(non_loopback) == 1:
+            host_ip = non_loopback[0]
 
         else:
             print("Multiple ips have been detected. Please select a suitable one:\n")
@@ -49,23 +89,21 @@ try:
 
     else:
         # 验证ip格式
-        if len(host_ip.split(".")) == 4:
-            for i in host_ip.split("."):
-                if 0 <= int(i) <= 255:
-                    continue
+        try:
+            ipaddress.ip_address(host_ip)
 
-                else:
-                    logger.info(f"配置的ip地址不符合，请填写正确格式ip地址")
-                    exit()
+        except ValueError:
+            logger.info(f"配置的ip地址不符合，请填写正确格式ip地址")
+            exit(1)
 
-    post = config.get_nested("server_set", "post")
+    port = config.get_nested("server_set", "port")
     public = config.get_nested("server_set", "public")
     mode = config.get_nested("server_set", "mode")
     logger.info(f"FastAPI 服务启动成功")
 
 except Exception as e:
     print(f"配置加载失败: {e}")
-    raise
+    exit(1)
 
 
 # 初始化FastAPI应用
@@ -85,6 +123,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/static/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -113,30 +152,36 @@ export default defineConfig({
     port: 5173,
     proxy: {
         '/api': {
-            target: 'http://host_ip:post',
+            target: 'host_ip:port',
             changeOrigin: true,
-            rewrite: (path) => path.replace(/^\/api/, ''),
+            // rewrite: (path) => path.replace(/^\/api/, ''),
         },
     },
   },
 })"""
 
+    # 更新前端配置
+
+    if not update_vite_config(data, host_ip, port, public.lower() == "true"):
+        logger.warning("Failed to update frontend config, manual intervention required")
+
     # 替换本地ip
-    data = data.replace("host_ip:post", host_ip + f":{post}" if public == "True" else f"localhost:{post}")
-
-    # 覆盖
-    with open("./rr_frontend/vite.config.ts", "w") as f:
-        f.write(data)
-
-    logger.info(f"自动ip配置成功，ip: {host_ip}, post: {post}")
+    # data = data.replace("host_ip:port", host_ip + f":{port}" if public == "True" else f"localhost:{port}")
+    # 
+    # # 覆盖
+    # with open("./rr_frontend/vite.config.ts", "w") as f:
+    #     f.write(data)
+    # 
+    # logger.info(f"自动ip配置成功，ip: {host_ip}, port: {port}")
 
 except Exception as e:
-    logger.info(f"自动ip配置失败，请手动修改./rr_frontend/vite.config.ts 文件的host_ip:post字段")
+    logger.info(f"自动ip配置失败，请手动修改./rr_frontend/vite.config.ts 文件的host_ip:port字段")
 
+# 配置CORS域
 # 本地使用
 local_allow_origins = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8000", "http://localhost:4173"]
 # 跨设备使用
-public_allow_origins = [f"http://{host_ip}:3000", f"http://{host_ip}:5173", f"http://{host_ip}:{post}", f"http://{host_ip}:4173"]
+public_allow_origins = [f"http://{host_ip}:3000", f"http://{host_ip}:5173", f"http://{host_ip}:{port}", f"http://{host_ip}:4173"]
 
 
 # 配置CORS以允许前端访问
@@ -160,6 +205,8 @@ app.include_router(github)
 app.include_router(history)
 # 可视化节点
 app.include_router(mindmap)
+# 删除记录节点
+app.include_router(deleteHistory)
 
 if mode.lower() == "test":
     logger.info(f"当前模式： Test")
@@ -169,7 +216,7 @@ if mode.lower() == "test":
     # 根路径返回 index.html
     @app.get("/")
     async def serve_index():
-        logger.info("Serving index.html")
+        # logger.info("Serving index.html")
         return FileResponse("./static/index.html")
 
     # 日志中间件
@@ -181,7 +228,7 @@ if mode.lower() == "test":
         return response
 
 
-# Root endpoint
+# 根端点
 @app.get("/")
 async def root():
     """
@@ -210,12 +257,8 @@ async def health_check():
     logger.info("请求运行状况检查")
     return {"status": "healthy", "message": "API is running"}
 
-# @app.get("/test")
-# async def test_history():
-#     return {"message": "Test history endpoint"}
-
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=port)
 

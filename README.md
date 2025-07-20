@@ -95,7 +95,7 @@ print(donggui())
 
 ## 快速启动
 
-1. #### **配置环境**:
+1. ### 配置环境:
    
    ***python环境要求***： 
    
@@ -298,7 +298,49 @@ deepseek:
 
 3. **添加更多语言**
 
-   项目中对于代码审计是基于 Python Tree-sitter(github：https://github.com/tree-sitter/py-tree-sitter)， 项目内置了五种语言的处理库，见于 RadishRobot\backend\core\vendor 目录下：
+   项目中对于代码审计是基于 Python Tree-sitter(github：https://github.com/tree-sitter/py-tree-sitter)， 而完整的语言包没法上传，所以需要自己下载，这里给出五种语言的下载命令
+
+   
+
+   **切换到vendor目录下**
+
+   ```bash
+   cd ./RadishRobot/backend/core/vendor
+   ```
+
+   **Python**
+
+   ```bash
+   git clone https://github.com/tree-sitter/tree-sitter-python
+   ```
+
+   **C++**
+
+   ```bash
+   git clone https://github.com/tree-sitter/tree-sitter-cpp
+   ```
+
+   **Java**
+
+   ```bash
+   git clone https://github.com/tree-sitter/tree-sitter-java
+   ```
+
+   **C#**
+
+   ```bash
+   git clone https://github.com/tree-sitter/tree-sitter-c-sharp
+   ```
+
+   **Javascript**
+
+   ```bash
+   git clone https://github.com/tree-sitter/tree-sitter-javascript
+   ```
+
+   
+
+   安装完成后可见于 RadishRobot\backend\core\vendor 目录下：
 
    ```bash
     tree-sitter-c-sharp
@@ -324,7 +366,7 @@ deepseek:
 
 4. #### **修改默认端口**
 
-   1. 修改配置文件 ".\RadishRobot\rr_frontend\node_modules\vite\dist\node\constants.js" 末尾处配置项：
+   1. 开发模式中修改配置文件 ".\RadishRobot\rr_frontend\node_modules\vite\dist\node\constants.js" 末尾处配置项：
 
       除非专业人员否则不建议改动该文件内容，会导致很多bug
 
@@ -337,7 +379,7 @@ deepseek:
 
 5. **Linux配置可能存在的问题**
 
-   1. 执行 npm run dev 提示 sh: 1: vite: Permission denied， 解决方法：
+   1. 执行 **npm run dev** 提示 **sh: 1: vite: Permission denied**， 解决方法：
 
       ```bash
       cd RadishRobot/rr_frontend
@@ -348,14 +390,51 @@ deepseek:
 
       
 
-   2.  依旧是执行 npm run dev 时候提示 Platform-specific optional dependencies not being included in `package-lock.json` when reinstalling with `node_modules` present， [https://github.com/npm/cli/issues/4828],依照官方给出的方法需要完全删除 node_modules 文件夹，但这样太麻烦了，我将node_modules文件夹完整上传本身就是为了方便用户搭建，节省环境配置时间，解决方法：
+   2. 依旧是执行 **npm run dev** 时候提示 **Platform-specific optional dependencies not being included in `package-lock.json` when reinstalling with `node_modules` present**， [https://github.com/npm/cli/issues/4828],依照官方给出的方法需要完全删除 node_modules 文件夹，但这样太麻烦了，我将node_modules文件夹完整上传本身就是为了方便用户搭建，节省环境配置时间，解决方法：
 
       ```bash
       cd RadishRobot/rr_frontend
       npm install
       ```
 
-      由于项目开发环境为Win，可能会有些文件与Linux环境不匹配，不必删除，直接 install 一下即可。
+      由于项目开发环境为Win，可能会有些文件与Linux环境不匹配，不必删除，直接 install 重置一下即可。
+
+      
+
+   3.  在 Linux 环境下执行 **npm run build** 出现 **sh: 1: tsc: Permission denied** 错误提示
+
+      GitHub收录： https://github.com/npm/cli/issues/3189
+
+      问题是没有权限导致的，如果项目是刚从仓库拉取，则需要连续执行
+
+      ```bash
+      cd RadishRobot/rr_frontend
+      npm install
+      chmod +x node_modules/.bin/vite
+      chmod +x node_modules/.bin/tsc		# 否则只需执行这一条即可
+      ```
+
+      
+
+   4. ***FileNotFoundError: 配置文件 .\config.yaml 不存在.*** 或者 ***UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position 17: invalid continuation byte*** 
+
+      检查文件，如果文件存在则是文件编码问题，如果不存在可回到github上恢复一下
+
+      ```bash
+      vim config.yaml
+      :set fileencoding=utf-8		# 强制转为utf-8编码
+      :wq
+      ```
+
+      
+
+   5. ***RuntimeError: Failed to import distutils. You may need to install setuptools.*** 这大概是python3.12及以上版本导致的bug，python 3.12 中 distutils 被移除了，但可以使用pip install setuptools 来获得这个包
+
+      ```bash
+      pip install setuptools
+      ```
+
+      
 
 
 
@@ -381,8 +460,82 @@ python main.py
 
 
 
+## 非Release版本打包部署
 
-【流式更新日志】
+如果需要做一些特别的设置（比如修改开放端口等），需要先处于开放模式调试成功之后再打包。
+
+
+
+### 参数设置
+
+```yaml
+server_set:
+  # auto 自动配置（Automatic configuration） ; 或者强制指定（Fixed ip address: XXX.XXX.XXX.XXX）
+  host_ip: "auto"
+  # 端口
+  port: 8000
+  # 公开服务 false true
+  public: "false"
+  # Development、dp、Dp 开发模式； Test、test 测试模式
+  mode: "dp"
+```
+
+ 
+
+host_ip： 设置为auto会自动检测设备ip，如果有多个ip会让给出选择，任选其一。也可以是强制指定IP地址
+
+port：端口，默认是8000，可根据需要自行修改，但是修改完之后需要处于开发模式执行以此覆盖其他附属文件参数。
+
+public：公开服务设置，设置为true之后服务可以被外部访问，但需要再防火墙中对端口提前设置好。
+
+mode：执行模式，可选开发模式/测试模式之一：
+
+​	开发模式：前后分离，可实现实时参数修改，但启动需要两条命令
+
+​	测试模式：前后不分离，需要提前对资源打包，参数不可修改，启动只需要一条命令
+
+
+
+### 基本流程
+
+修改各项参数之后执行：
+
+```bash
+python main.py
+cd rr_frontend
+npm run dev
+```
+
+
+
+测试项目流程闭环（各项功能正常）后，打包
+
+```bash
+cd rr_frontend
+npm run build
+```
+
+
+
+打包完成之后，**将打包后的 dist 文件夹内容移动到根目录下的 static 文件夹中**
+
+```bash
+cp ./rr_frontend/dist/* ./static
+```
+
+
+
+移动成功之后，**将配置文件中的执行模式改为test**，执行命令即可
+
+```bash
+python main.py
+```
+
+
+
+
+
+## 【流式更新日志】
 
 2025.7.3 
 
@@ -404,7 +557,17 @@ python main.py
 
 分流支持 **开发** 和 **测试 **两种模式
 
+2025.7.19
 
+修复config.yaml 文件编码跨平台异常问题
+
+ 添加记录删除功能
+
+修复React框架异步更新机制导致的传参问题
+
+优化整体执行流程
+
+修复大量跨平台部署bug
 
 
 
