@@ -375,68 +375,67 @@ deepseek:
       const DEFAULT_PREVIEW_PORT = 4173;	# 预览模式的post
       ```
 
+
+
+
+## Linux配置可能存在的问题
+
+1. 执行 **npm run dev** 提示 **sh: 1: vite: Permission denied**， 解决方法：
+
+   ```bash
+   cd RadishRobot/rr_frontend
+   chmod +x node_modules/.bin/vite
+   ```
+
+   这是由于文件没有足够的执行权限，提权之后即可
+
    
 
-5. **Linux配置可能存在的问题**
+2. 执行 **npm run dev** 时候提示 **Platform-specific optional dependencies not being included in `package-lock.json` when reinstalling with `node_modules` present**， [https://github.com/npm/cli/issues/4828], **或者提示某处语法错误**， 依照官方给出的方法需要完全删除 node_modules 文件夹，但这样太麻烦了，我将node_modules文件夹完整上传本身就是为了方便用户搭建，节省环境配置时间，解决方法：
 
-   1. 执行 **npm run dev** 提示 **sh: 1: vite: Permission denied**， 解决方法：
+   ```bash
+   cd RadishRobot/rr_frontend
+   npm install
+   ```
 
-      ```bash
-      cd RadishRobot/rr_frontend
-      chmod +x node_modules/.bin/vite
-      ```
+   由于项目开发环境为Win，可能会有些文件与Linux环境不匹配，不必删除，直接 install 重置一下即可。
 
-      这是由于文件没有足够的执行权限，提权之后即可
+   
 
-      
+3. 在 Linux 环境下执行 **npm run build** 出现 **sh: 1: tsc: Permission denied** 错误提示
 
-   2. 依旧是执行 **npm run dev** 时候提示 **Platform-specific optional dependencies not being included in `package-lock.json` when reinstalling with `node_modules` present**， [https://github.com/npm/cli/issues/4828],依照官方给出的方法需要完全删除 node_modules 文件夹，但这样太麻烦了，我将node_modules文件夹完整上传本身就是为了方便用户搭建，节省环境配置时间，解决方法：
+   GitHub收录： https://github.com/npm/cli/issues/3189
 
-      ```bash
-      cd RadishRobot/rr_frontend
-      npm install
-      ```
+   问题是没有权限导致的，如果项目是刚从仓库拉取，则需要连续执行
 
-      由于项目开发环境为Win，可能会有些文件与Linux环境不匹配，不必删除，直接 install 重置一下即可。
+   ```bash
+   cd RadishRobot/rr_frontend
+   npm install
+   chmod +x node_modules/.bin/vite
+   chmod +x node_modules/.bin/tsc		# 否则只需执行这一条即可
+   ```
 
-      
+   
 
-   3.  在 Linux 环境下执行 **npm run build** 出现 **sh: 1: tsc: Permission denied** 错误提示
+4. ***FileNotFoundError: 配置文件 .\config.yaml 不存在.*** 或者 ***UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position 17: invalid continuation byte*** 
 
-      GitHub收录： https://github.com/npm/cli/issues/3189
+   检查文件，如果文件存在则是文件编码问题，如果不存在可回到github上恢复一下
 
-      问题是没有权限导致的，如果项目是刚从仓库拉取，则需要连续执行
+   ```bash
+   vim config.yaml
+   :set fileencoding=utf-8		# 强制转为utf-8编码
+   :wq
+   ```
 
-      ```bash
-      cd RadishRobot/rr_frontend
-      npm install
-      chmod +x node_modules/.bin/vite
-      chmod +x node_modules/.bin/tsc		# 否则只需执行这一条即可
-      ```
+   
 
-      
+5. ***RuntimeError: Failed to import distutils. You may need to install setuptools.*** 这大概是python3.12及以上版本导致的bug，python 3.12 中 distutils 被移除了，但可以使用pip install setuptools 来获得这个包
 
-   4. ***FileNotFoundError: 配置文件 .\config.yaml 不存在.*** 或者 ***UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position 17: invalid continuation byte*** 
+   ```bash
+   pip install setuptools
+   ```
 
-      检查文件，如果文件存在则是文件编码问题，如果不存在可回到github上恢复一下
-
-      ```bash
-      vim config.yaml
-      :set fileencoding=utf-8		# 强制转为utf-8编码
-      :wq
-      ```
-
-      
-
-   5. ***RuntimeError: Failed to import distutils. You may need to install setuptools.*** 这大概是python3.12及以上版本导致的bug，python 3.12 中 distutils 被移除了，但可以使用pip install setuptools 来获得这个包
-
-      ```bash
-      pip install setuptools
-      ```
-
-      
-
-
+   
 
 ## Release 版本部署
 
@@ -555,7 +554,7 @@ python main.py
 
 打包推出Release 0.0.1体验版本
 
-分流支持 **开发** 和 **测试 **两种模式
+分流支持 **开发** 和 **测试**两种模式
 
 2025.7.19
 
@@ -568,6 +567,10 @@ python main.py
 优化整体执行流程
 
 修复大量跨平台部署bug
+
+2025.7.22
+
+修点小bug
 
 
 

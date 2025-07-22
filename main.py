@@ -69,7 +69,6 @@ try:
 
         # 优先选择非回环地址
         non_loopback = [ip for ip in ip_list if not ipaddress.ip_address(ip).is_loopback]
-        host_ip = non_loopback[0]
 
         if len(non_loopback) == 1:
             host_ip = non_loopback[0]

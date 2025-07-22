@@ -17,7 +17,7 @@ import requests
 from openai import OpenAI
 from ollama import chat, ChatResponse
 
-user_config = Config(r".\config.yaml")
+user_config = Config(r"./config.yaml")
 # user_config = Config("./config.yaml")
 logger = setup_logger(user_config)
 

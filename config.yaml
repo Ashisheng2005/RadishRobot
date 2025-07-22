@@ -14,9 +14,9 @@ server_set:
   # 端口
   port: 8000
   # 公开服务 false true
-  public: "true"
+  public: "false"
   # Development、dp、Dp 开发模式； Test、test 测试模式
-  mode: "test"
+  mode: "dp"
 
 deepseek:
   API_KEY: ""
